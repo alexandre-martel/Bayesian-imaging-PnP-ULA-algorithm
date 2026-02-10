@@ -11,7 +11,9 @@ class ULAIterator():
  
     def __init__(self, algo_params: dict):
         
-        self.dncnn = dinv.models.DnCNN(in_channels=1)
+        self.dncnn = dinv.models.DnCNN(in_channels=1,
+        out_channels=1,
+        pretrained="download")
         
         missing_params = []
 
@@ -40,7 +42,9 @@ class ULAIterator():
     @staticmethod
     def get_physics(sigma_noise=1/255, device='cpu'):
         kernel = torch.ones((1, 1, 9, 9)) / 81.0
-        physics = dinv.physics.Blur(filter=kernel, device=device)
+        physics = dinv.physics.Blur(filter=kernel,
+            padding="circular",
+            device=device)
         physics.noise_model = dinv.physics.GaussianNoise(sigma=sigma_noise)
         return physics
  
@@ -49,7 +53,7 @@ class ULAIterator():
         # Ideally choose a random vector
         # To decrease the chance that our vector
         # Is orthogonal to the eigenvector
-        b_k_np = np.random.rand(256, 256).astype(np.float32)
+        b_k_np = np.random.rand(225, 225).astype(np.float32)
         b_k = torch.from_numpy(b_k_np).unsqueeze(0).unsqueeze(0)
 
         for _ in range(num_iterations):
@@ -82,7 +86,7 @@ class ULAIterator():
         # Likelihood gradient
         grad_likelihood = self.likelihood_grad(X, y)
         
-        x_t1 = self.delta * grad_likelihood + self.alpha * self.delta/self.epsilon * (D - X) + np.sqrt(2* self.delta) * Z 
+        x_t1 = self.delta * grad_likelihood + self.alpha * self.delta/((5/255)**2) * (D - X) + np.sqrt(2* self.delta) * Z 
         
         final = self.clip(X + x_t1)
         

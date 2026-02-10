@@ -30,13 +30,13 @@ img_blurred = physics(img)
 # img_for_plot = img_blurred.squeeze().cpu().numpy()
 # plt.imsave('camera_man_blurred.png', img_for_plot, cmap='gray')
 
-
-for i in range(10):
+img_temp = img_blurred.clone()
+for i in range(200):
  print(f"Iteration {i+1}")
- img = ula.step(img, img_blurred)
+ img_temp = ula.step(img_temp, img_blurred)
 
 
-img_for_plot = img.squeeze().cpu().numpy()
+img_for_plot = img_temp.squeeze().cpu().numpy()
 plt.imsave('camera_man_unblurred.png', img_for_plot, cmap='gray')
 
 
