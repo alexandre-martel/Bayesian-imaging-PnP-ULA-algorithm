@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-class PnP():
+class Denoiser():
  def __init__(self, denoiser):
   self.denoiser = denoiser
 
