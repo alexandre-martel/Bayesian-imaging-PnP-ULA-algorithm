@@ -7,36 +7,54 @@ import numpy as np
 import torch
 
 
-physics = ULAIterator.get_physics(sigma_noise=1/255, device='cpu')
+denoiser_param = 2/255
+sigma_destruction = 3/255
+physics = ULAIterator.get_physics(sigma_noise=sigma_destruction, device='cpu')
 L=1
-denoiser_param = (5/255)**2
-Ly = 255**2 * ULAIterator.power_iteration(physics, num_iterations=10)**2
-delta = 0.5/(L/denoiser_param + Ly)
+Ly = ULAIterator.power_iteration(physics, num_iterations=100)/sigma_destruction**2
+# delta = 0.9/(L/denoiser_param + Ly)
+delta = 0.01*sigma_destruction**2
 
 algo_params_default = {
  "alpha": 1.0,
  "denoiser_param": denoiser_param,
- "sigma_destruction": 1.5,
+ "sigma_destruction": sigma_destruction,
  "delta": delta,
  "physics": physics
 }
 
 ula = ULAIterator(algo_params_default)
 
-img = np.array(Image.open('data/camera_man.jpg').convert('L')).astype(np.float32)
+img = np.array(Image.open('data/camera_man.jpg').convert('L')).astype(np.float32) / 255.0
 img = torch.from_numpy(img).unsqueeze(0).unsqueeze(0)
 img_blurred = physics(img)
 
-# img_for_plot = img_blurred.squeeze().cpu().numpy()
-# plt.imsave('camera_man_blurred.png', img_for_plot, cmap='gray')
+img_for_plot2 = img_blurred.squeeze().cpu().numpy()
+plt.imsave('camera_man_blurred.png', img_for_plot2, cmap='gray')
+
+burn_in = 500
+n_iter = 1000
 
 img_temp = img_blurred.clone()
-for i in range(200):
- print(f"Iteration {i+1}")
- img_temp = ula.step(img_temp, img_blurred)
 
+mean_img = torch.zeros_like(img_temp)
+count = 0
 
-img_for_plot = img_temp.squeeze().cpu().numpy()
+for i in range(n_iter):
+
+    if i % 10 == 0:
+        print(f"Iteration {i}")
+
+    img_temp = ula.step(img_temp, img_blurred)
+
+    # After burn-in only
+    if i >= burn_in:
+        mean_img += img_temp
+        count += 1
+
+mean_img /= count
+
+img_for_plot = mean_img.squeeze().cpu().numpy()
 plt.imsave('camera_man_unblurred.png', img_for_plot, cmap='gray')
 
 

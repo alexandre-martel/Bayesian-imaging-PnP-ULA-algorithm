@@ -13,7 +13,7 @@ class ULAIterator():
         
         self.dncnn = dinv.models.DnCNN(in_channels=1,
         out_channels=1,
-        pretrained="download")
+        pretrained="download_lipschitz")
         
         missing_params = []
 
@@ -69,7 +69,7 @@ class ULAIterator():
         return b_k
 
     def likelihood_grad(self, X, y):
-        grad = (1/self.sigma_destruction**2) *  self.physics.A_adjoint(self.physics.A(X) - y)
+        grad = -(1/2*self.sigma_destruction**2) *  self.physics.A_adjoint(self.physics.A(X) - y)
         return grad
     
     def clip(self, X):
@@ -86,7 +86,7 @@ class ULAIterator():
         # Likelihood gradient
         grad_likelihood = self.likelihood_grad(X, y)
         
-        x_t1 = self.delta * grad_likelihood + self.alpha * self.delta/((5/255)**2) * (D - X) + np.sqrt(2* self.delta) * Z 
+        x_t1 = self.delta * grad_likelihood + self.alpha * self.delta/(self.denoiser_param) * (D - X) + np.sqrt(2* self.delta) * Z 
         
         final = self.clip(X + x_t1)
         
