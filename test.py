@@ -1,5 +1,4 @@
 import deepinv as dinv
-from scipy import linalg
 from src.ULA_class import ULAIterator
 import matplotlib.pyplot as plt
 import PIL.Image as Image
@@ -12,8 +11,8 @@ sigma_destruction = 3/255
 physics = ULAIterator.get_physics(sigma_noise=sigma_destruction, device='cpu')
 L=1
 Ly = ULAIterator.power_iteration(physics, num_iterations=100)/sigma_destruction**2
-# delta = 0.9/(L/denoiser_param + Ly)
-delta = 0.01*sigma_destruction**2
+delta = 0.9/(L/denoiser_param + Ly)
+# delta = 0.01*sigma_destruction**2
 
 algo_params_default = {
  "alpha": 1.0,
@@ -32,8 +31,8 @@ img_blurred = physics(img)
 img_for_plot2 = img_blurred.squeeze().cpu().numpy()
 plt.imsave('camera_man_blurred.png', img_for_plot2, cmap='gray')
 
-burn_in = 500
-n_iter = 1000
+burn_in = 300
+n_iter = 2000
 
 img_temp = img_blurred.clone()
 
@@ -42,12 +41,14 @@ count = 0
 
 for i in range(n_iter):
 
-    if i % 10 == 0:
+    if i % 100 == 0:
         print(f"Iteration {i}")
+        
+    if i % 100 == 0:
+     plt.imshow(img_temp.squeeze().cpu(), cmap="gray")
+     plt.show()
 
     img_temp = ula.step(img_temp, img_blurred)
-
-    # After burn-in only
     if i >= burn_in:
         mean_img += img_temp
         count += 1

@@ -3,7 +3,6 @@ from torch import Tensor
 import time as time
 import numpy as np
 import deepinv as dinv
-from deepinv.physics.forward import adjoint_function
 
  
 
