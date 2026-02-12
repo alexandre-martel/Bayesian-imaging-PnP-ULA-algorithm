@@ -12,7 +12,7 @@ class ULAIterator():
         
         self.dncnn = dinv.models.DnCNN(in_channels=1,
         out_channels=1,
-        pretrained="download_lipschitz")
+        pretrained="download")
         
         missing_params = []
 
@@ -39,8 +39,8 @@ class ULAIterator():
     
     
     @staticmethod
-    def get_physics(sigma_noise=1/255, device='cpu'):
-        kernel = torch.ones((1, 1, 9, 9)) / 81.0
+    def get_physics(sigma_noise=1/255,kernel_size=5,  device='cpu'):
+        kernel = torch.ones((1, 1, kernel_size, kernel_size)) / (kernel_size**2)
         physics = dinv.physics.Blur(filter=kernel,
             padding="circular",
             device=device)
@@ -65,7 +65,8 @@ class ULAIterator():
             # re normalize the vector
             b_k = b_k1 / b_k1_norm
 
-        return b_k
+        spectral_norm_sq = torch.norm(physic.A_adjoint(physic.A(b_k))).item()
+        return spectral_norm_sq
 
     def likelihood_grad(self, X, y):
         grad = -(1/2*self.sigma_destruction**2) *  self.physics.A_adjoint(self.physics.A(X) - y)
@@ -73,23 +74,22 @@ class ULAIterator():
     
     def clip(self, X):
         return torch.clamp(X, self.C[0], self.C[1])
-        
-    def step(self, X, y):
-        
-        # Noise 
-        Z = torch.randn_like(X)
-        
-        # Denoiser 
-        D = self.dncnn(X, self.denoiser_param)
-        
-        # Likelihood gradient
-        grad_likelihood = self.likelihood_grad(X, y)
-        
-        x_t1 = self.delta * grad_likelihood + self.alpha * self.delta/(self.denoiser_param) * (D - X) + np.sqrt(2* self.delta) * Z 
-        
-        final = self.clip(X + x_t1)
-        
-        return final
             
 
-        # metrics PSRN et SIM
+    def step(self, X, y):
+        # Bruit 
+        Z = torch.randn_like(X)
+        
+        # Denoiser (DnCNN)
+        D = self.dncnn(X, self.denoiser_param)
+        
+        # Gradient de la vraisemblance
+        grad_L = self.likelihood_grad(X, y)
+        
+        step_vraisemblance = - self.delta * grad_L
+        step_prior = self.alpha * (self.delta / self.denoiser_param) * (D - X)
+        bruit_langevin = np.sqrt(2 * self.delta) * Z
+        
+        x_next = X + step_vraisemblance + step_prior + bruit_langevin
+        
+        return self.clip(x_next)

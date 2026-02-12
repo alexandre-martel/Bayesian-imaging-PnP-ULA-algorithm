@@ -12,7 +12,7 @@ physics = ULAIterator.get_physics(sigma_noise=sigma_destruction, device='cpu')
 L=1
 Ly = ULAIterator.power_iteration(physics, num_iterations=100)/sigma_destruction**2
 delta = 0.1/(L/denoiser_param + Ly)
-# delta = 0.01*sigma_destruction**2
+
 
 algo_params_default = {
  "alpha": 1.0,
