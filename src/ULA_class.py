@@ -81,7 +81,7 @@ class ULAIterator():
         Z = torch.randn_like(X)
         
         # Denoiser (DnCNN)
-        D = self.dncnn(X, self.denoiser_param)
+        D = self.dncnn(X, np.sqrt(self.denoiser_param))
         
         # Gradient de la vraisemblance
         grad_L = self.likelihood_grad(X, y)
