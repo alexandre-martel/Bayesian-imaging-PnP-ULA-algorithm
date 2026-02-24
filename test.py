@@ -6,7 +6,7 @@ import numpy as np
 import torch
 
 
-denoiser_param = 100/255**2
+denoiser_param = 20/255**2
 sigma_destruction = 3/255
 physics = ULAIterator.get_physics(sigma_noise=sigma_destruction, device='cpu')
 
@@ -45,7 +45,7 @@ for i in range(n_iter):
 
     if i % 100 == 0:
         print(f"Iteration {i}")
-        plt.imsave(f"debug/debug_{i}.png", img_temp.squeeze().cpu().numpy(), cmap="gray")        
+        plt.imsave(f"debug/debug_{i}.png", img_temp.squeeze().cpu().detach().numpy(), cmap="gray")        
 
     img_temp = ula.step(img_temp, img_blurred)
     if i >= burn_in:
