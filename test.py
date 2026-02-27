@@ -6,10 +6,9 @@ import numpy as np
 import torch
 
 
-denoiser_param = 20/255**2
+denoiser_param = 10/255**2
 sigma_destruction = 3/255
 physics = ULAIterator.get_physics(sigma_noise=sigma_destruction, device='cpu')
-
 
 L=1
 Ly = ULAIterator.power_iteration(physics, num_iterations=100)/sigma_destruction**2
@@ -33,7 +32,7 @@ img_blurred = physics(img)
 img_for_plot2 = img_blurred.squeeze().cpu().numpy()
 plt.imsave('camera_man_blurred.png', img_for_plot2, cmap='gray')
 
-burn_in = 300
+burn_in = 0
 n_iter = 2000
 
 img_temp = img_blurred.clone()

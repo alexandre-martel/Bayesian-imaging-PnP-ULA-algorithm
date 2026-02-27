@@ -41,11 +41,11 @@ class ULAIterator():
     
     @staticmethod
     def get_physics(
-        sigma_noise: float = 1/255,
-        kernel_type: str = "box3",   # "identity" | "box3" | "gaussian"
-        kernel_size: int = 3,            # utilisé si kernel_type=="box3" ou "gaussian"
-        sigma_blur: float = 0.6,         # utilisé si kernel_type=="gaussian"
-        device: str = 'cpu'
+        sigma_noise = 1/255,
+        kernel_type = "box3",   # "identity" | "box3" 
+        kernel_size = 3,            # utilisé si kernel_type=="box3" 
+        sigma_blur = 0.6,         # utilisé si kernel_type=="gaussian"
+        device = 'cpu'
     ):
         if kernel_type == "identity":
             # Noyau delta (pas de flou)
