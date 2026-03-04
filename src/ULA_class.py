@@ -43,14 +43,41 @@ class ULAIterator():
         self.physics = algo_params["physics"]
     
     
+    
     @staticmethod
-    def get_physics(sigma_noise=1/255,kernel_size=5,  device='cpu'):
-        kernel = torch.ones((1, 1, kernel_size, kernel_size)) / (kernel_size**2)
-        physics = dinv.physics.Blur(filter=kernel,
+    def get_physics(
+        sigma_noise = 1/255,
+        kernel_type = "box3",   # "identity" | "box3" 
+        kernel_size = 3,            # utilisé si kernel_type=="box3" 
+        sigma_blur = 0.6,         # utilisé si kernel_type=="gaussian"
+        device = 'cpu'
+    ):
+        if kernel_type == "identity":
+            # Noyau delta (pas de flou)
+            kernel = torch.zeros((1, 1, 1, 1), device=device)
+            kernel[0, 0, 0, 0] = 1.0
+
+        elif kernel_type == "box3":
+            ks = 3
+            kernel = torch.ones((1, 1, ks, ks), device=device) / (ks * ks)
+
+        # elif kernel_type == "gaussian":
+        #     ks = int(kernel_size)
+        #     if ks % 2 == 0:
+        #         ks += 1  # on force impair
+        #     kernel = _gaussian_kernel(ks, float(sigma_blur), device=device)
+
+        else:
+            raise ValueError(f"kernel_type inconnu: {kernel_type}")
+
+        physics = dinv.physics.Blur(
+            filter=kernel,
             padding="circular",
-            device=device)
+            device=device
+        )
         physics.noise_model = dinv.physics.GaussianNoise(sigma=sigma_noise)
         return physics
+
  
     @staticmethod
     def power_iteration(physic, num_iterations: int) -> np.ndarray:
