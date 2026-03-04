@@ -10,9 +10,14 @@ class ULAIterator():
  
     def __init__(self, algo_params: dict):
         
-        self.dncnn = dinv.models.DnCNN(in_channels=1,
-        out_channels=1,
-        pretrained="download")
+        if algo_params.get("denoiser") == "DnCNN":
+            self.dncnn = dinv.models.DnCNN(in_channels=1,
+            out_channels=1,
+            pretrained="download")
+        elif algo_params.get("denoiser") == "DRUNet":
+            self.dncnn = dinv.models.DRUNet(in_channels=1,
+            out_channels=1,
+            pretrained="download")
         
         missing_params = []
 
@@ -30,7 +35,7 @@ class ULAIterator():
                 f"Missing required parameters for ULA: {', '.join(missing_params)}"
             )
             
-        self.C = [-1, 2]
+        self.C = [0,1]
         self.denoiser_param = algo_params["denoiser_param"]
         self.alpha = algo_params["alpha"]
         self.sigma_destruction = algo_params["sigma_destruction"]
@@ -69,7 +74,7 @@ class ULAIterator():
         return spectral_norm_sq
 
     def likelihood_grad(self, X, y):
-        grad = -(1/2*self.sigma_destruction**2) *  self.physics.A_adjoint(self.physics.A(X) - y)
+        grad = -(self.sigma_destruction**2) *  self.physics.A_adjoint(self.physics.A(X) - y)
         return grad
     
     def clip(self, X):
@@ -86,7 +91,7 @@ class ULAIterator():
         # Gradient de la vraisemblance
         grad_L = self.likelihood_grad(X, y)
         
-        step_vraisemblance = - self.delta * grad_L
+        step_vraisemblance =  self.delta * grad_L
         step_prior = self.alpha * (self.delta / self.denoiser_param) * (D - X)
         bruit_langevin = np.sqrt(2 * self.delta) * Z
         

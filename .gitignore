@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 debug/
-debug_keep/
+debug_dncnn/
 debug_keep*/
 
 # C extensions
