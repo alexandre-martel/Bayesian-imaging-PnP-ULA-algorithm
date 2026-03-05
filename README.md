@@ -3,7 +3,12 @@
 This project implements an image restoration method (deblurring / denoising) based on the **Unadjusted Langevin Algorithm**, using the DeepInverse library.  
 The approach combines inverse physical models with deep denoisers acting as priors.
 
----
+<p align="left">
+  <img src="camera_man_blurred.png" width="45%">
+  <img src="camera_man_unblurred.png" width="45%">
+</p>
+
+
 
 ## Installation
 
