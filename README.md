@@ -52,11 +52,11 @@ The performance of the algorithm strongly depends on the tuning of the hyperpara
     * `n_iter` recommended : ~6000.
 
 ### 2. Physical and Convergence Parameters
-* **sigma_destruction** : Defines the noise level introduced by the physical model (ex: 1/255**2).
+* **sigma_destruction** : Defines the noise level introduced by the physical model (ex: $1/255^2$).
 * **denoiser_param** : Strength of the denoising prior. For DRUNet, a value around 25/255 is a good starting point.
 * **delta (Step size)** : The step size is automatically computed using the Lipschitz constant of the physics ($L_y$) :
 
-$$\delta = \frac{0.5}{\frac{L}{\text{denoiser\_param}} + L_y}$$
+$\delta = \frac{0.5}{\frac{L}{\text{denoiser\_param}} + L_y}$
 
 ## Algorithm and Equations
 
