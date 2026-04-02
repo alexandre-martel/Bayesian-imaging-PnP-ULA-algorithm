@@ -45,11 +45,11 @@ The performance of the algorithm strongly depends on the tuning of the hyperpara
 
 ### 1. Choice of the Denoiser
 * **DRUNet** : Very effective for complex blur (we didn't succeed to calibrate it well)
-    * `burn_in` recommended : ~100.
-    * `n_iter` recommended : ~500.
+    * `burn_in` recommended : 100.
+    * `n_iter` recommended : 500.
 * **DnCNN** : Faster per iteration but often requires more steps.
-    * `burn_in` recommended : ~1000.
-    * `n_iter` recommended : ~6000.
+    * `burn_in` recommended : 1000.
+    * `n_iter` recommended : 6000.
 
 ### 2. Physical and Convergence Parameters
 * **sigma_destruction** : Defines the noise level introduced by the physical model (ex: $1/255^2$).
