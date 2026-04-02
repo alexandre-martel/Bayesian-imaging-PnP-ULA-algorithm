@@ -23,17 +23,12 @@ The approach combines inverse physical models with deep denoisers acting as prio
     pip install torch torchvision numpy matplotlib pillow deepinv
     ```
 
-## Usage
-
-### Run the main restoration test
+## Run
 
 To run the restoration on the test image (camera_man.jpg) :
     ```bash
     python test.py
     ```
-
-### Independent metric computation
-
 A script is provided to compute PSNR and SSIM between two saved images:
     ```bash
     python src/calculate_metrics.py -path1 "data/original.png" -path2 --path-to-img-2
@@ -43,7 +38,7 @@ A script is provided to compute PSNR and SSIM between two saved images:
 
 The performance of the algorithm strongly depends on the tuning of the hyperparameters stored in the dictionary `algo_params_default` :
 
-### 1. Choice of the Denoiser
+### Choice of the Denoiser
 * **DRUNet** : Very effective for complex blur (we didn't succeed to calibrate it well)
     * `burn_in` recommended : 100.
     * `n_iter` recommended : 500.
@@ -51,12 +46,12 @@ The performance of the algorithm strongly depends on the tuning of the hyperpara
     * `burn_in` recommended : 1000.
     * `n_iter` recommended : 6000.
 
-### 2. Physical and Convergence Parameters
+### Physical and Convergence Parameters
 * **sigma_destruction** : Defines the noise level introduced by the physical model (ex: $1/255^2$).
 * **denoiser_param** : Strength of the denoising prior. For DRUNet, a value around 25/255 is a good starting point.
 * **delta (Step size)** : The step size is automatically computed using the Lipschitz constant of the physics ($L_y$) :
 
-$\delta = \frac{0.5}{\frac{L}{\text{denoiser\_param}} + L_y}$
+$\delta = \frac{0.5}{\frac{L}{\text{denoiser_param}} + L_y}$
 
 ## Algorithm and Equations
 
